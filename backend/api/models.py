@@ -8,7 +8,7 @@ class User(AbstractUser):
         return self.username
     
     def get_weight(self):
-        return self.current_weight  # возвращает float или None
+        return self.current_weight  
 
 class Exercise(models.Model):
     title = models.CharField(max_length=100)
@@ -16,14 +16,14 @@ class Exercise(models.Model):
 
     def __str__(self):
         return self.title
-
+    
+    
 class Workout(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     note = models.TextField(blank=True)
 
     def __str__(self):
         return f"Тренировка {self.created_at.strftime('%d.%m.%Y')}"
-
 
 class WorkoutItem(models.Model):
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE, related_name="items")
