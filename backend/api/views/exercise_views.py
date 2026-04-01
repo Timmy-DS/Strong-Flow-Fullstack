@@ -4,7 +4,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from ..models import Exercise
 from ..serializers import ExerciseSerializers
-from api.services.exercise_service import create_exercise
+from api.services.exercise_service import update_exercise, delete_exercise, create_exercise_from_api
 
 class ExerciseItemAPIView(PublicAPIView):
     
@@ -13,16 +13,10 @@ class ExerciseItemAPIView(PublicAPIView):
         serializer = ExerciseSerializers(items, many=True)
         return Response(serializer.data)
     
+    
     def post(self, request):
-        serializer = ExerciseSerializers(data=request.data) 
-        if serializer.is_valid():
-            exercise = create_exercise(
-                title=serializer.validated_data['title'],
-                muscle_group=serializer.validated_data['muscle_group']
-            )
-            output_serializer = ExerciseSerializers(exercise)
-            return Response(output_serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+      result = create_exercise_from_api(request.data)
+      return Response(result, status=status.HTTP_201_CREATED)
 
 class ExerciseItemDetailAPIView(PublicAPIView):
     
@@ -31,18 +25,12 @@ class ExerciseItemDetailAPIView(PublicAPIView):
         serializer = ExerciseSerializers(item)
         return Response(serializer.data)
     
-    
-    #  # МЕТОД: Обновить (PUT /api/workout-items/1/)
-    # def put(self, request, pk):
-    #     item = get_object_or_404(WorkoutItem, pk=pk)
-    #     serializer = WorkoutItemSerializers(item, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # # МЕТОД: Удалить (DELETE /api/workout-items/1/)
-    # def delete(self, request, pk):
-    #     item = get_object_or_404(WorkoutItem, pk=pk)
-    #     item.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    def put(self, request, pk):
+      result = update_exercise(pk, request.data)
+      return Response(result)
+
+
+    def delete(self, request, pk):
+        delete_exercise(pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
